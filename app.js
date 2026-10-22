@@ -2,11 +2,10 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-// v2: Input payment with validation checks
 app.post('/api/payment', (req, res) => {
     const { cardNumber, amount, cardHolder } = req.body;
     
-    // v2 structural detail check
+    // v2 Validation Checks
     if (!cardNumber || !amount || !cardHolder) {
         return res.status(400).json({ error: "Missing required payment fields" });
     }
@@ -17,10 +16,21 @@ app.post('/api/payment', (req, res) => {
         return res.status(400).json({ error: "Transaction amount must be greater than zero." });
     }
     
+    // v3: Generate confirmation receipt
+    const transactionId = "TXN-" + Math.floor(Math.random() * 90000000 + 10000000);
+    
     res.status(200).json({ 
-        status: "Payment Validated", 
-        message: "v2: Details checked and approved." 
+        status: "Success",
+        message: "v3: Receipt Generated.",
+        receipt: {
+            transactionId: transactionId,
+            timestamp: new Date().toISOString(),
+            merchant: "Localhost Payment System Inc.",
+            amount: `$${parseFloat(amount).toFixed(2)}`,
+            cardUsed: `**** **** **** ${cardNumber.slice(-4)}`,
+            cardHolder: cardHolder
+        }
     });
 });
 
-app.listen(3000, () => console.log('Payment Gateway v2 running on port 3000'));
+app.listen(3000, () => console.log('Payment Gateway v3 running on port 3000'));
